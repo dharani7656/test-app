@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Phishing Detection System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #0d6efd;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 1.5rem;
+            color: #0d6efd;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        ul {
+            margin-top: 0.5rem;
+        }
+
+        li {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .image-container {
+            width: 100%;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .highlight-box {
+            background-color: #f1f5f9;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+        }
+
+        .button-container {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        button,
+        .cta-button {
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        button:hover,
+        .cta-button:hover {
+            background-color: #0b5ed7;
+        }
+
+        .cta-button {
+            text-decoration: none;
+            display: inline-block;
+            background-color: #198754;
+        }
+
+        .cta-button:hover {
+            background-color: #157347;
+        }
+
+        .steps {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #eef2f6;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            button,
+            .cta-button {
+                width: 100%;
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Email Phishing Detection System 🛡️</h1>
+
+        <p>Phishing attacks are on the rise, targeting individuals and organizations through deceptive emails. Our Email Phishing Detection System is a robust solution designed to safeguard your inbox by identifying malicious emails in real-time.</p>
+
+
+        <h2>How It Works</h2>
+        <ul>
+            <li>Securely fetches your emails via API integration.</li>
+            <li>Analyzes email content using a Machine Learning model.</li>
+            <li>Notifies you immediately if phishing is detected.</li>
+        </ul>
+
+        <h2>Model Performance & Accuracy</h2>
+        <p>We employ a Logistic Regression model for email classification, achieving:</p>
+        <ul>
+            <li>Test Accuracy: <strong>97.07%</strong></li>
+            <li>Training Accuracy: <strong>98.24%</strong></li>
+        </ul>
+
+        <h2>What is Logistic Regression?</h2>
+        <p>Logistic Regression is a statistical algorithm widely used in machine learning for binary classification problems. It estimates the probability that a given input belongs to one of two categories:</p>
+        <ul>
+            <li>In our system, it classifies emails as <strong>"Phishing"</strong> or <strong>"Safe"</strong>.</li>
+            <li>It identifies patterns in the subject, sender information, and body content to make accurate predictions.</li>
+            <li>Known for its <strong>efficiency</strong> and <strong>interpretability</strong>, Logistic Regression is a preferred choice for text-based security solutions.</li>
+        </ul>
+
+        <div class="image-container">
+            <img src="https://www.machinelearningplus.com/wp-content/uploads/2021/06/linear_vs_logistic_regression-1536x681.jpg" alt="Logistic Regression Model Illustration">
+        </div>
+
+        <div class="highlight-box">
+            <h2>Get This Service in 3 Easy Steps:</h2>
+            <div class="steps">
+                <p><strong>1.</strong> Click <strong>Contact Us</strong> below.</p>
+                <p><strong>2.</strong> Fill out the Google Form with your details.</p>
+                <p><strong>3.</strong> Receive a confirmation email to activate the service.</p>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button onclick="checkAuthAndFetchEmails()">Fetch Emails & Authenticate</button>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdttFaDFXu_hbHckjsVVXvSvVTIIUaRmHClLb6STYVacysmvw/viewform?usp=dialog" target="_blank" class="cta-button">Contact Us</a>
+        </div>
+    </div>
+
+
+    <script>
+        async function checkAuthAndFetchEmails() {
+            try {
+                const response = await fetch('/check-auth');
+                const data = await response.json();
+                if (data.authenticated) {
+                    window.location.href = '/dashboard';
+                } else {
+                    window.location.href = '/authenticate';
+                }
+            } catch (error) {
+                console.error('Error checking authentication:', error);
+                alert('An error occurred while checking authentication.');
+            }
+        }
+    </script>
+</body>
+
+</html>

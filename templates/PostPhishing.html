@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post-Phishing Analysis | Secure Upload</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            padding: 40px;
+            text-align: center;
+            border-radius: 12px;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .drop-zone.dragover {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+        }
+
+        .code-snippet {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .section-header {
+            color: #1f2937;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .section-content {
+            color: #4b5563;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+
+        .section-container {
+            margin-bottom: 2rem;
+        }
+
+        .cta-container {
+            text-align: center;
+            background-color: #eff6ff;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-start pt-8">
+
+    <div class="bg-white shadow-xl rounded-2xl p-8 max-w-3xl w-full space-y-8">
+
+        <!-- Page Heading -->
+        <div class="text-center">
+            <h1 class="text-4xl font-bold text-blue-600">Post-Phishing Network Traffic Analysis</h1>
+            <p class="text-gray-600 mt-2">Upload your network traffic (PCAP) file for a detailed analysis of potential threats. Our experts will provide a comprehensive security report.</p>
+        </div>
+
+        <!-- Section 1: Description of the Service -->
+        <div class="section-container">
+            <h2 class="section-header">What We Do</h2>
+            <p class="section-content">Our team will analyze your uploaded PCAP file to detect any suspicious or malicious activities, such as phishing attacks, malware communication, and more.</p>
+        </div>
+
+        <!-- Section 2: Steps to Collect Network Traffic -->
+        <div class="section-container">
+            <h2 class="section-header">How to Collect Network Traffic (PCAP)</h2>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                <li>Download and install <a href="https://www.wireshark.org/download.html" class="text-blue-500 underline" target="_blank">Wireshark</a>.</li>
+                <li>Open Wireshark and select your network interface (e.g., Wi-Fi or Ethernet).</li>
+                <li>Start capturing traffic, perform your network activity, and then stop capture.</li>
+                <li>Save the captured traffic as a <strong>.pcap</strong> file.</li>
+            </ol>
+        </div>
+
+        <!-- Section 3: Alternative Collection Method using Python -->
+        <div class="section-container">
+            <h2 class="section-header">Capture Traffic with Python (Scapy)</h2>
+            <div class="code-snippet">
+                <code>
+from scapy.all import sniff, wrpcap
+
+def capture_traffic(interface, count, filename):
+    packets = sniff(iface=interface, count=count)
+    wrpcap(filename, packets)
+
+capture_traffic('eth0', 100, 'network_traffic.pcap')
+                </code>
+            </div>
+        </div>
+
+        <!-- CTA: Prepare for Upload -->
+        <div class="cta-container">
+            <p class="text-blue-700 font-semibold">Once you've captured your network traffic, you're ready to upload it for analysis!</p>
+        </div>
+
+        <!-- Drop Zone for File Upload -->
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+            <p class="text-gray-500">Drag & drop your PCAP file here or <span class="text-blue-500 font-medium cursor-pointer">browse</span></p>
+            <input type="file" id="fileInput" accept=".pcap" class="hidden" />
+        </div>
+
+        <!-- Upload Button -->
+        <button id="uploadButton" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition mt-4">Submit for Analysis</button>
+    </div>
+
+    <!-- JavaScript for File Upload Logic -->
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.getElementById('uploadButton');
+
+        // Drag & Drop Styling
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            fileInput.files = e.dataTransfer.files;
+        });
+
+        // File Upload Logic
+        uploadButton.addEventListener('click', () => {
+            if (fileInput.files.length === 0) {
+                alert('Please select a PCAP file to upload.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('pcap', file);
+
+            fetch('http://127.0.0.1:5000/upload-pcap', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message || 'File uploaded successfully!');
+                })
+                .catch(err => {
+                    console.error('Upload failed:', err);
+                    alert('Failed to upload the file. Please try again.');
+                });
+        });
+    </script>
+
+</body>
+
+</html>

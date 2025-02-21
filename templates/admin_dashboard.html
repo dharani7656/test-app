@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Real-Time Phishing Stats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <div class="container mx-auto px-6 py-8">
+        <div class="flex justify-between items-center mb-10">
+            <h1 class="text-4xl font-extrabold text-gray-800">🚀 Admin Dashboard</h1>
+            <div class="flex items-center gap-4">
+                <button id="darkModeToggle"
+                    class="bg-gray-800 text-white px-4 py-2 rounded-lg transition hover:bg-gray-600">🌙 Dark Mode</button>
+                <a href="/admin/logout"
+                    class="bg-red-500 text-white px-4 py-2 rounded-lg transition hover:bg-red-600">🔒 Logout</a>
+            </div>
+        </div>
+
+        <!-- Real-time Phishing Statistics Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-700">📊 Real-Time Phishing Attempts</h2>
+            <div class="relative h-64">
+                <canvas id="phishing-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- PCAP File Details Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-700">📂 Uploaded PCAP Files</h2>
+            <ul>
+                {% for detail in pcap_details %}
+                <li class="bg-gray-50 p-4 rounded-lg mb-4 border-l-4 border-blue-500 shadow-sm">
+                    <p class="text-lg font-medium">Filename: {{ detail.filename }}</p>
+                    <p class="text-sm text-gray-600">Number of Packets: {{ detail.num_packets }}</p>
+                    <p class="text-sm text-gray-600">Protocols: {{ detail.protocols | join(', ') }}</p>
+                    <a href="/download/{{ detail.filename }}" class="text-blue-600 hover:text-blue-800 underline">⬇️ Download</a>
+                </li>
+                {% else %}
+                <p class="text-gray-500 italic">No PCAP files uploaded yet.</p>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Upload PDF and Email Report Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-700">📤 Upload PDF & Send Report</h2>
+            <form action="/upload_email_report" method="POST" enctype="multipart/form-data" class="space-y-4">
+                <div>
+                    <label class="block text-lg mb-2">Select PDF File:</label>
+                    <input type="file" name="pdf_file" accept=".pdf" required
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300">
+                </div>
+
+                <div>
+                    <label class="block text-lg mb-2">Recipient's Email:</label>
+                    <input type="email" name="email" placeholder="example@domain.com" required
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300">
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-lg transition transform hover:scale-105">
+                    📧 Upload PDF & Send Report
+                </button>
+                
+            </form>
+        </div>
+    </div>
+
+    <!-- Real-time Phishing Stats + Dark Mode Script -->
+    <script>
+        const ctx = document.getElementById('phishing-chart').getContext('2d');
+
+        const phishingChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Safe Emails', 'Phishing Emails'],
+                datasets: [{
+                    label: 'Email Classification',
+                    data: [0, 0], // Initial values, will be updated
+                    backgroundColor: ['#10B981', '#EF4444'],
+                    borderColor: ['#047857', '#B91C1C'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        const socket = io();
+
+        // Listen for updated stats from the backend
+        socket.on('update_stats', function (data) {
+            console.log('Received updated stats:', data);
+            phishingChart.data.datasets[0].data = [data.safe_count, data.phishing_count];
+            phishingChart.update();
+        });
+
+        socket.on('update_stats_error', function (error) {
+            console.error('Stats update error:', error);
+            alert('Failed to update phishing stats. Please check the console for more details.');
+        });
+
+        // Request stats from the backend when the page loads
+        socket.emit('request_stats');
+
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('bg-gray-800');
+            document.body.classList.toggle('text-gray-200');
+        });
+
+       
+    </script>
+</body>
+
+</html>
